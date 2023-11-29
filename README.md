@@ -142,3 +142,4 @@ Usage: <class_name>.update(<_id>, <dictionary>)
 <br>
 claudine
 abdelkader
+sabrina
