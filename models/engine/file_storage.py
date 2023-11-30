@@ -8,15 +8,16 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        if cls:
-            cls_objects = {}
+        dict_all = {}
+        if cls is None:
+            return FileStorage.__objects
+        else:
             for k, v in FileStorage.__objects.items():
                 if cls == v.__class__:
-                    cls_objects[k] = v
-            return cls.objects
-        return FileStorage.__objects
+                    dict_all[k] = v
+            return dict_all
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
