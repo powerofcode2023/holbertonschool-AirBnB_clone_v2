@@ -5,43 +5,33 @@ from unittest.mock import patch
 from io import StringIO
 import os
 import json
-import console
-import tests
 from console import HBNBCommand
-from models.base_model import BaseModel
-from models.user import User
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.place import Place
-from models.review import Review
-from models.engine.file_storage import FileStorage
 from models.engine.db_storage import DBStorage
 
 
 class TestConsole(unittest.TestCase):
-    """ this will test the console """
+    """ This will test the console """
 
     @classmethod
     def setUpClass(cls):
-        """setup for the test"""
+        """ Setup for the test """
         cls.consol = HBNBCommand()
 
     @classmethod
-    def teardown(cls):
-        """at the end of the test this will tear it down"""
+    def tearDownClass(cls):
+        """ At the end of the test this will tear it down """
         del cls.consol
 
     def tearDown(self):
-        """Remove temporary file (file.json) created as a result"""
+        """ Remove temporary file (file.json) created as a result """
         try:
             os.remove("file.json")
         except Exception:
             pass
 
     def test_docstrings_in_console(self):
-        """checking for docstrings"""
-        self.assertIsNotNone(console.__doc__)
+        """ Checking for docstrings """
+        self.assertIsNotNone(HBNBCommand.__doc__)
         self.assertIsNotNone(HBNBCommand.emptyline.__doc__)
         self.assertIsNotNone(HBNBCommand.do_quit.__doc__)
         self.assertIsNotNone(HBNBCommand.do_EOF.__doc__)
@@ -50,13 +40,13 @@ class TestConsole(unittest.TestCase):
         self.assertIsNotNone(HBNBCommand.default.__doc__)
 
     def test_emptyline(self):
-        """Test empty line input"""
+        """ Test empty line input """
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("\n")
             self.assertEqual('', f.getvalue())
 
     def test_create(self):
-        """Test create command inpout"""
+        """ Test create command input """
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("create")
             self.assertEqual(
@@ -69,7 +59,7 @@ class TestConsole(unittest.TestCase):
             self.consol.onecmd("create User")
 
     def test_show(self):
-        """Test show command inpout"""
+        """ Test show command input """
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("show")
             self.assertEqual(
@@ -88,7 +78,7 @@ class TestConsole(unittest.TestCase):
                 "** no instance found **\n", f.getvalue())
 
     def test_destroy(self):
-        """Test destroy command inpout"""
+        """ Test destroy command input """
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("destroy")
             self.assertEqual(
@@ -107,7 +97,7 @@ class TestConsole(unittest.TestCase):
                 "** no instance found **\n", f.getvalue())
 
     def test_update(self):
-        """Test update command inpout"""
+        """ Test update command input """
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("update")
             self.assertEqual(
@@ -137,12 +127,147 @@ class TestConsole(unittest.TestCase):
             self.assertEqual(
                 "** value missing **\n", f.getvalue())
 
-    def setUp(self):
-        self.db = DBStorage()
-        self.console = HBNBCommand()
+    def test_create_dbstorage(self):
+        """Test create command with DBStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        self.assertIn("User", f.getvalue())
 
-    def tearDown(self):
-        pass
+    def test_show_dbstorage(self):
+        """Test show command with DBStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        my_id = f.getvalue()[f.getvalue().find('(')+1:f.getvalue().find(')')]
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("show User {}".format(my_id))
+        self.assertIn("User", f.getvalue())
+
+    def test_destroy_dbstorage(self):
+        """Test destroy command with DBStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        my_id = f.getvalue()[f.getvalue().find('(')+1:f.getvalue().find(')')]
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("destroy User {}".format(my_id))
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        self.assertNotIn("User", f.getvalue())
+
+    def test_all_dbstorage(self):
+        """Test all command with DBStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create BaseModel")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create State")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create City")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create Place")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create Amenity")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create Review")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all")
+        self.assertIn("User", f.getvalue())
+        self.assertIn("BaseModel", f.getvalue())
+        self.assertIn("State", f.getvalue())
+        self.assertIn("City", f.getvalue())
+        self.assertIn("Place", f.getvalue())
+        self.assertIn("Amenity", f.getvalue())
+        self.assertIn("Review", f.getvalue())
+
+    def test_update_dbstorage(self):
+        """Test update command with DBStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        my_id = f.getvalue()[f.getvalue().find('(')+1:f.getvalue().find(')')]
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("update User {} name 'Betty'".format(my_id))
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        self.assertIn("'name': 'Betty'", f.getvalue())
+
+    def test_create_filestorage(self):
+        """Test create command with FileStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        self.assertIn("User", f.getvalue())
+
+    def test_show_filestorage(self):
+        """Test show command with FileStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        my_id = f.getvalue()[f.getvalue().find('(')+1:f.getvalue().find(')')]
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("show User {}".format(my_id))
+        self.assertIn("User", f.getvalue())
+
+    def test_destroy_filestorage(self):
+        """Test destroy command with FileStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        my_id = f.getvalue()[f.getvalue().find('(')+1:f.getvalue().find(')')]
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("destroy User {}".format(my_id))
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        self.assertNotIn("User", f.getvalue())
+
+    def test_all_filestorage(self):
+        """Test all command with FileStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create BaseModel")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create State")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create City")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create Place")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create Amenity")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create Review")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all")
+        self.assertIn("User", f.getvalue())
+        self.assertIn("BaseModel", f.getvalue())
+        self.assertIn("State", f.getvalue())
+        self.assertIn("City", f.getvalue())
+        self.assertIn("Place", f.getvalue())
+        self.assertIn("Amenity", f.getvalue())
+        self.assertIn("Review", f.getvalue())
+
+    def test_update_filestorage(self):
+        """Test update command with FileStorage"""
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("create User")
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        my_id = f.getvalue()[f.getvalue().find('(')+1:f.getvalue().find(')')]
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("update User {} name 'Betty'".format(my_id))
+        with patch('sys.stdout', new=StringIO()) as f:
+            self.consol.onecmd("all User")
+        self.assertIn("'name': 'Betty'", f.getvalue())
 
 
 if __name__ == "__main__":
