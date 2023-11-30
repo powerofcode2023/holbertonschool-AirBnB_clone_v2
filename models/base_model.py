@@ -10,7 +10,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class BaseModel(Base):
+class BaseModel:
     """A base class for all hbnb models"""
     id = Column(String(60), primary_key=True, unique=True)
     created_at = Column(DateTime, default=datetime.utcnow(), nullable=False)
@@ -42,6 +42,7 @@ class BaseModel(Base):
 
     def to_dict(self):
         """Convert instance into dict format"""
+        dictionary = {}
         dictionary = self.__dict__.copy()
         dictionary['__class__'] = self.__class__.__name__
         dictionary['created_at'] = self.created_at.isoformat()
@@ -51,5 +52,6 @@ class BaseModel(Base):
         return dictionary
 
     def delete(self):
-        """Delete the current instance from the storage"""
+        """Dete the current intance from the storage"""
         models.storage.delete(self)
+        
