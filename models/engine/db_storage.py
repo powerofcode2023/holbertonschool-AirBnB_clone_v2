@@ -32,20 +32,25 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """ Query all objects of a class, if cls is None, query all classes """
+        """variable"""
         dic = {}
         if cls:
-            cls = eval(cls) if isinstance(cls, str) else cls
-            for obj in self.__session.query(cls).all():
-                key = f"{obj.__class__.__name__}.{obj.id}"
-                dic[key] = obj
+            """conditional"""
+            if type(cls) is str:
+                cls = eval(cls)
+            query = self.__session.query(cls)
+            for elem in query:
+                key = "{}.{}".format(type(elem).__name__, elem.id)
+                dic[key] = elem
         else:
-            classes = [State, City, User, Place, Review, Amenity]
-            for cls in classes:
-                for obj in self.__session.query(cls).all():
-                    key = f"{obj.__class__.__name__}.{obj.id}"
-                    dic[key] = obj
-        return dic
+            lista = [State, City, User, Place, Review, Amenity]
+            for clase in lista:
+                query = self.__session.query(clase)
+                for elem in query:
+                    key = "{}.{}".format(type(elem).__name__, elem.id)
+                    dic[key] = elem
+        """return"""
+        return (dic)
 
     def new(self, obj):
         """new"""
