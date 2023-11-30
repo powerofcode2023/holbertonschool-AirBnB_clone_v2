@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""This module defines a class to manage file storage for hbnb clone"""
+"""This module defines a class to manage DB storage for hbnb clone"""
 from models.base_model import Base
 from models.user import User
 from models.place import Place
@@ -18,18 +18,17 @@ MYSQL_DB = getenv('HBNB_MYSQL_DB')
 
 
 class DBStorage:
-    """This class manages storage of hbnb models in JSON format"""
+    """This class manages storage of hbnb models in a MySQL database"""
     __engine = None
     __session = None
 
     def __init__(self):
-        self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(MYSQL_USER,
-                                              MYSQL_PWD,
-                                              MYSQL_HOST,
-                                              MYSQL_DB))
-        hbnb_env = getenv("HBNB_ENV")
-        if hbnb_env == "test":
+        """Instantiate a DBStorage object"""
+        self.__engine = create_engine(
+            'mysql+mysqldb://{}:{}@{}/{}?charset=utf8mb4'.format(
+                MYSQL_USER, MYSQL_PWD, MYSQL_HOST, MYSQL_DB),
+            pool_pre_ping=True)
+        if getenv("HBNB_ENV") == "test":
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
@@ -67,10 +66,11 @@ class DBStorage:
             self.__session.delete(obj)
 
     def reload(self):
-        """"""
+        """Reloads data from the database"""
         Base.metadata.create_all(self.__engine)
-        sec = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        Session = scoped_session(sec)
+        session_factory = sessionmaker(bind=self.__engine,
+                                       expire_on_commit=False)
+        Session = scoped_session(session_factory)
         self.__session = Session()
 
     def close(self):
