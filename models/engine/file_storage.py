@@ -10,27 +10,26 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        dict_all = {}
         if cls is None:
-            return FileStorage.__objects
+            return self.__objects
         else:
-            for k, v in FileStorage.__objects.items():
-                if cls == v.__class__:
-                    dict_all[k] = v
-            return dict_all
+            new_dict = {}
+            for key, value in self.__objects.items():
+                if value.__class__.__name__ == cls.__name__:
+                    new_dict[key] = value
+            return new_dict
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        self.__objects[f"{obj.__class__.__name__}.{obj.id}"] = obj
 
     def save(self):
         """Saves storage dictionary to file"""
-        with open(FileStorage.__file_path, 'w') as f:
-            temp = {}
-            temp.update(FileStorage.__objects)
-            for key, val in temp.items():
-                temp[key] = val.to_dict()
-            json.dump(temp, f)
+        objects_dict = {}
+        for key, value in self.__objects.items():
+            objects_dict[key] = value.to_dict()
+        with open(self.__file_path, "w", encoding='utf-8') as f:
+            json.dump(objects_dict, f)
 
     def reload(self):
         """Loads storage dictionary from file"""
@@ -46,7 +45,8 @@ class FileStorage:
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
                     'State': State, 'City': City, 'Amenity': Amenity,
                     'Review': Review
-                  }
+                    }
+        """exception"""
         try:
             temp = {}
             with open(FileStorage.__file_path, 'r') as f:
@@ -55,3 +55,15 @@ class FileStorage:
                     self.all()[key] = classes[val['__class__']](**val)
         except FileNotFoundError:
             pass
+
+    def delete(self, obj=None):
+        """Delete obj from __objects"""
+        if obj is not None:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            if key in self.__objects:
+                del self.__objects[key]
+                self.save()
+
+    def close(self):
+        """close"""
+        self.reload()
