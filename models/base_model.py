@@ -54,4 +54,3 @@ class BaseModel:
     def delete(self):
         """Dete the current intance from the storage"""
         models.storage.delete(self)
-        
