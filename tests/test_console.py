@@ -19,7 +19,6 @@ from models.engine.file_storage import FileStorage
 from models.engine.db_storage import DBStorage
 
 
-
 class TestConsole(unittest.TestCase):
     """ this will test the console """
 
