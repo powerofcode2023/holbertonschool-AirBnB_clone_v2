@@ -36,7 +36,7 @@ class DBStorage:
         dic = {}
         if cls:
             """conditional"""
-            if type(cls) is str:
+            if isinstance(cls, str):
                 cls = eval(cls)
             query = self.__session.query(cls)
             for elem in query:
@@ -50,7 +50,7 @@ class DBStorage:
                     key = "{}.{}".format(type(elem).__name__, elem.id)
                     dic[key] = elem
         """return"""
-        return (dic)
+        return dic
 
     def new(self, obj):
         """new"""
@@ -68,8 +68,7 @@ class DBStorage:
     def reload(self):
         """Reloads data from the database"""
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine,
-                                       expire_on_commit=False)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
 
