@@ -32,19 +32,19 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """Query all objects depending on the class name."""
+        """ Query all objects of a class, if cls is None, query all classes """
         dic = {}
-        classes_to_query = [State, City]
-
         if cls:
-            classes_to_query = [cls] if cls in classes_to_query else []
-
-        for model_class in classes_to_query:
-            query = self.__session.query(model_class).all()
-            for obj in query:
+            cls = eval(cls) if isinstance(cls, str) else cls
+            for obj in self.__session.query(cls).all():
                 key = f"{obj.__class__.__name__}.{obj.id}"
                 dic[key] = obj
-
+        else:
+            classes = [State, City, User, Place, Review, Amenity]
+            for cls in classes:
+                for obj in self.__session.query(cls).all():
+                    key = f"{obj.__class__.__name__}.{obj.id}"
+                    dic[key] = obj
         return dic
 
     def new(self, obj):
