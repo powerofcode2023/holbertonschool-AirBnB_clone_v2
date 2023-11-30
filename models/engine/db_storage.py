@@ -10,6 +10,7 @@ from models.review import Review
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
+
 MYSQL_USER = getenv('HBNB_MYSQL_USER')
 MYSQL_PWD = getenv('HBNB_MYSQL_PWD')
 MYSQL_HOST = getenv('HBNB_MYSQL_HOST')
