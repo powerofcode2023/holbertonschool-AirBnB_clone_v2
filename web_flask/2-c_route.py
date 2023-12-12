@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
-    """ Function that returns 'Hello HBNB!' """
+    """ Returns 'Hello HBNB!' """
     return 'Hello HBNB!'
 
 
@@ -17,7 +17,7 @@ def hbnb():
 
 @app.route('/c/<text>', strict_slashes=False)
 def c_text(text):
-    """ Return 'C ' followed by the text """
+    """ Returns 'C ' followed by the text """
     return 'C ' + text.replace('_', ' ')
 
 
