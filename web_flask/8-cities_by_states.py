@@ -3,13 +3,14 @@
 
 from flask import Flask, render_template
 from models import storage
+from models.state import State
 app = Flask(__name__)
 
 
 @app.route('/cities_by_states', strict_slashes=False)
 def cities_by_states():
     """Displays a HTML page with a list of all State objects"""
-    states = storage.all("State").values()
+    states = storage.all(State)
     return render_template('8-cities_by_states.html', states=states)
 
 
